@@ -14,11 +14,18 @@ import argparse
 import json
 import os
 import shutil
+import sys
 import tempfile
 import urllib.request
 from pathlib import Path
 
 API = "https://api.github.com/repos/zhongfly/mpv-winbuild/releases/latest"
+
+for _s in (sys.stdout, sys.stderr):
+    try:
+        _s.reconfigure(encoding="utf-8")  # Windows 控制台默认 cp1252，print 中文会炸
+    except Exception:
+        pass
 
 
 def _http_get(url: str) -> bytes:

@@ -16,6 +16,12 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
 
+for _s in (sys.stdout, sys.stderr):
+    try:
+        _s.reconfigure(encoding="utf-8")  # Windows 控制台默认 cp1252，print 中文会炸
+    except Exception:
+        pass
+
 from smartplayer.config import models_dir  # noqa: E402
 
 
