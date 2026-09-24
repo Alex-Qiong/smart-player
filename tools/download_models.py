@@ -64,21 +64,10 @@ def download_tts(voice_id: str) -> None:
         raise SystemExit(f"未知语音 {voice_id}，可选：{list(VOICES)}")
     dest = models_dir() / "tts"
     dest.mkdir(parents=True, exist_ok=True)
-    url = VOICES[voice_id]
-    print(f"[TTS] 正在下载 {voice_id}\n      {url}")
-    with tempfile.TemporaryDirectory() as tmp:
-        tgz = Path(tmp) / "voice.tar.gz"
-        urllib.request.urlretrieve(url, tgz)
-        with tarfile.open(tgz, "r:gz") as tf:
-            tf.extractall(tmp)
-        # 找到 onnx + json
-        onnx = next(Path(tmp).rglob("*.onnx"), None)
-        cfg = next(Path(tmp).rglob("*.onnx.json"), None)
-        if onnx is None:
-            raise SystemExit("下载包中未找到 .onnx 语音文件")
-        (dest / f"{voice_id}.onnx").write_bytes(onnx.read_bytes())
-        if cfg is not None:
-            (dest / f"{voice_id}.onnx.json").write_bytes(cfg.read_bytes())
+    onnx_url, json_url = VOICES[voice_id]
+    print(f"[TTS] 正在下载 {voice_id}\n      {onnx_url}")
+    urllib.request.urlretrieve(onnx_url, dest / f"{voice_id}.onnx")
+    urllib.request.urlretrieve(json_url, dest / f"{voice_id}.onnx.json")
     print(f"[TTS] 完成 -> {dest}")
 
 

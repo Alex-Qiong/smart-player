@@ -7,15 +7,17 @@ from __future__ import annotations
 
 from pathlib import Path
 
-# 常用语音及下载地址（piper-voices v1.0.0）
+# 常用语音及下载地址（HuggingFace rhasspy/piper-voices 镜像，
+# 原 GitHub release 已迁移失效）
+HF = "https://huggingface.co/rhasspy/piper-voices/resolve/main"
 VOICES = {
     "zh_CN-huayan-medium": (
-        "https://github.com/rhasspy/piper-voices/releases/download/v1.0.0/"
-        "voice-zh_CN-huayan-medium.tar.gz"
+        f"{HF}/zh/zh_CN/huayan/medium/zh_CN-huayan-medium.onnx",
+        f"{HF}/zh/zh_CN/huayan/medium/zh_CN-huayan-medium.onnx.json",
     ),
     "en_US-lessac-medium": (
-        "https://github.com/rhasspy/piper-voices/releases/download/v1.0.0/"
-        "voice-en_US-lessac-medium.tar.gz"
+        f"{HF}/en/en_US/lessac/medium/en_US-lessac-medium.onnx",
+        f"{HF}/en/en_US/lessac/medium/en_US-lessac-medium.onnx.json",
     ),
 }
 
