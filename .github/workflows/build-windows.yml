@@ -24,6 +24,8 @@ jobs:
           pip install -r requirements.txt pyinstaller py7zr requests
 
       - name: 下载 libmpv-2.dll
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: python tools/fetch_libmpv.py
 
       - name: PyInstaller 打包

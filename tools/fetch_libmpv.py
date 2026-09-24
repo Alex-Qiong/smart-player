@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import shutil
 import tempfile
 import urllib.request
@@ -21,7 +22,11 @@ API = "https://api.github.com/repos/zhongfly/mpv-winbuild/releases/latest"
 
 
 def _http_get(url: str) -> bytes:
-    req = urllib.request.Request(url, headers={"User-Agent": "SmartPlayer"})
+    headers = {"User-Agent": "SmartPlayer"}
+    token = os.environ.get("GITHUB_TOKEN") or os.environ.get("GH_TOKEN")
+    if token:
+        headers["Authorization"] = f"Bearer {token}"
+    req = urllib.request.Request(url, headers=headers)
     with urllib.request.urlopen(req, timeout=60) as r:
         return r.read()
 
