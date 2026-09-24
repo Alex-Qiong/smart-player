@@ -1,0 +1,37 @@
+name: Build Windows EXE
+
+# 推送代码或手动触发时，在微软的 Windows 云主机上自动打包 exe
+on:
+  push:
+    branches: [main, master]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - name: 拉取代码
+        uses: actions/checkout@v4
+
+      - name: 安装 Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: 安装依赖
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt pyinstaller py7zr requests
+
+      - name: 下载 libmpv-2.dll
+        run: python tools/fetch_libmpv.py
+
+      - name: PyInstaller 打包
+        run: pyinstaller --noconfirm player.spec
+
+      - name: 上传产物
+        uses: actions/upload-artifact@v4
+        with:
+          name: SmartPlayer-windows
+          path: dist/SmartPlayer/
+          if-no-files-found: error
