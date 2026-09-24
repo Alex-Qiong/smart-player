@@ -29,8 +29,8 @@ Name: "chinesesimp"; MessagesFile: "ChineseSimplified.isl"
 Name: "desktopicon"; Description: "创建桌面快捷方式"; GroupDescription: "附加任务:"; Flags: unchecked
 
 [Files]
-; 主程序（PyInstaller 打包产物）
-Source: "dist\SmartPlayer\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+; 主程序（PyInstaller 打包产物，路径相对于本脚本所在目录）
+Source: "..\dist\SmartPlayer\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 ; 中文配音语音（Piper TTS），装到用户数据目录，免去手动放置
 Source: "installer\assets\tts\*"; DestDir: "{userappdata}\SmartPlayer\models\tts"; Flags: ignoreversion recursesubdirs createallsubdirs
 
