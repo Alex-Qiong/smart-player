@@ -14,6 +14,7 @@ import argparse
 import json
 import os
 import shutil
+import subprocess
 import sys
 import tempfile
 import urllib.request
@@ -64,20 +65,39 @@ def main() -> None:
         archive = Path(tmp) / asset["name"]
         urllib.request.urlretrieve(url, archive)
         print("[libmpv] 解压…")
-        try:
-            import py7zr
-        except ImportError:
-            raise SystemExit(
-                "需要 py7zr 来解压：pip install py7zr\n"
-                f"或手动解压 {archive}，把 libmpv-2.dll 放到 {out}"
-            )
-        with py7zr.SevenZipFile(archive, "r") as z:
-            z.extractall(tmp)
+        _extract_7z(archive, Path(tmp))
         dll = next(Path(tmp).rglob("libmpv-2.dll"), None)
         if dll is None:
             raise SystemExit("包中未找到 libmpv-2.dll")
         shutil.copy2(dll, out / "libmpv-2.dll")
     print(f"[libmpv] 完成 -> {out / 'libmpv-2.dll'}")
+
+
+def _extract_7z(archive: Path, dest: Path) -> None:
+    """优先用系统 7-Zip（GitHub Windows 云机预装），py7zr 只做备选。
+
+    mpv-winbuild 的 7z 包用了 py7zr 不支持的压缩算法，直接用 py7zr 会报
+    UnsupportedCompressionMethodError。
+    """
+    seven_zip = shutil.which("7z") or shutil.which("7za")
+    if seven_zip:
+        print("[libmpv] 用 7-Zip 解压…")
+        subprocess.run(
+            [seven_zip, "x", str(archive), f"-o{dest}", "-y"],
+            check=True,
+            capture_output=True,
+        )
+        return
+    try:
+        import py7zr
+    except ImportError:
+        raise SystemExit(
+            "需要解压工具：安装 7-Zip 或 pip install py7zr\n"
+            f"或手动解压 {archive}，把 libmpv-2.dll 放到输出目录"
+        )
+    print("[libmpv] 用 py7zr 解压…")
+    with py7zr.SevenZipFile(archive, "r") as z:
+        z.extractall(dest)
 
 
 if __name__ == "__main__":
