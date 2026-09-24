@@ -1,6 +1,6 @@
-name: Build Windows EXE
+name: Build Windows 安装包
 
-# 推送代码或手动触发时，在微软的 Windows 云主机上自动打包 exe
+# 推送代码或手动触发时，在微软的 Windows 云主机上自动打包安装版 exe
 on:
   push:
     branches: [main, master]
@@ -31,9 +31,19 @@ jobs:
       - name: PyInstaller 打包
         run: pyinstaller --noconfirm player.spec
 
-      - name: 上传产物
+      - name: 下载 TTS 中文语音（打包进安装程序）
+        run: |
+          mkdir installer\assets\tts
+          curl -sL -o installer\assets\tts\zh_CN-huayan-medium.onnx "https://huggingface.co/rhasspy/piper-voices/resolve/main/zh/zh_CN/huayan/medium/zh_CN-huayan-medium.onnx"
+          curl -sL -o installer\assets\tts\zh_CN-huayan-medium.onnx.json "https://huggingface.co/rhasspy/piper-voices/resolve/main/zh/zh_CN/huayan/medium/zh_CN-huayan-medium.onnx.json"
+
+      - name: Inno Setup 生成安装包
+        run: |
+          & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" installer\smartplayer.iss
+
+      - name: 上传安装包
         uses: actions/upload-artifact@v4
         with:
-          name: SmartPlayer-windows
-          path: dist/SmartPlayer/
+          name: SmartPlayer-installer
+          path: installer-out/SmartPlayer-Setup-*.exe
           if-no-files-found: error
